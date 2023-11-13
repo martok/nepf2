@@ -1,0 +1,19 @@
+{
+	"name": "martok/nepf2",
+	"description": "description",
+	"license": "proprietary",
+	"require": {
+		"monolog/monolog": "^3.4",
+		"php": ">=8.2.0",
+		"popphp/pop-db": "6.0.x-dev",
+		"psr/log": "^3.0",
+		"sabre/http": ">=5.0",
+		"sabre/uri": ">=2.0",
+		"twig/twig": "^3.6"
+	},
+	"autoload": {
+		"psr-4": {
+			"Nepf2\\": "src/"
+		}
+	}
+}
