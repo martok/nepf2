@@ -22,6 +22,7 @@ class Application
     private array $userConfig = [];
     private array $logChannels = [];
     private Request $activeRequest;
+    private Response $activeResponse;
     public readonly bool $isCLI;
 
     public function __construct()
@@ -122,6 +123,11 @@ class Application
         return $this->activeRequest;
     }
 
+    public function response(): Response
+    {
+        return $this->activeResponse;
+    }
+
     /**
      * Register a class implementing IComponent as a global component.
      *
@@ -189,15 +195,14 @@ class Application
     public function run(): void
     {
         // Set up the request globals
-        $request = Request::create();
-        $response = Response::create();
+        $this->activeRequest = $request = Request::create();
+        $this->activeResponse = $response = Response::create();
         // Find a match on the router
         $method = $request->getMethod();
         $path = $request->uri()['path'];
         $path = '/' . ltrim($path, '/');
         /* @var $match ?RouteMatcher */
         if ($match = $this->router->match($method, $path)) {
-            $this->activeRequest = $request;
             $response->setStatus(200);
             try {
                 if (!$match->executeRoute($this, $request, $response))
