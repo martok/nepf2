@@ -2,20 +2,13 @@
 
 namespace Nepf2;
 
-use Sabre\HTTP\ResponseDecorator;
+use Sabre\HTTP;
 
-class Response extends ResponseDecorator
+class Response extends HTTP\ResponseDecorator
 {
-    const HTTP_RESPONSE_TEXT = [
-        400 => 'Bad request',
-        403 => 'Access denied',
-        404 => 'Not found',
-        500 => 'Internal Server Error'
-    ];
-
     public static function create(): Response
     {
-        return new self(new \Sabre\HTTP\Response());
+        return new self(new HTTP\Response());
     }
 
     public function redirect(string $uri, int $status = 301): void
@@ -27,8 +20,8 @@ class Response extends ResponseDecorator
     public function standardResponse(int $code): void
     {
         $this->setStatus($code);
-        if (isset(self::HTTP_RESPONSE_TEXT[$code]))
-            $this->setBody('<h1>' . self::HTTP_RESPONSE_TEXT[$code] . '</h1>');
+        if (($code >= 400) && isset(HTTP\Response::$statusCodes[$code]))
+            $this->setBody('<h1>' . HTTP\Response::$statusCodes[$code] . '</h1>');
     }
 
     public function setJSON(array $object, bool $adjustContentType = true): void
