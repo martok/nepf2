@@ -66,4 +66,18 @@ class Path
         return self::Normalize($result);
     }
 
+    public static function Pop(string $path, bool $trailing=true): array
+    {
+        if (!$trailing)
+            $path = rtrim($trailing, '/');
+        $pos = strrpos($path, '/');
+        if ($pos !== false) {
+            return [
+                substr($path, 0, $pos),
+                substr($path, $pos+1)
+            ];
+        }
+        return ['', $path];
+    }
+
 }
