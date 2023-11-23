@@ -73,6 +73,7 @@ class Session implements \Nepf2\IComponent
             unset($_COOKIE[$this->session_name]);
         }
 
+        session_cache_limiter('');
         session_start();
 
         // ensure a clean session namespace
