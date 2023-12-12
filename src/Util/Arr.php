@@ -5,17 +5,38 @@ namespace Nepf2\Util;
 class Arr
 {
     /**
+     * Produce the union set of one or more arrays.
+     *
+     * @param array ...$arrays
+     * @return array
+     */
+    public static function Union(... $arrays): array
+    {
+        $set = [];
+        foreach ($arrays as $array) {
+            foreach ($array as $item) {
+                $set[$item] = true;
+            }
+        }
+        return array_keys($set);
+    }
+
+    /**
      * Recursively merge arrays similar to array_merge_recursive($defaults, $values), but
-     * keeping only keys that exists in $defaults, dropping the rest.
+     * by default keeping only keys that exists in $defaults, dropping the rest.
      *
      * @param array $defaults
      * @param array $values
+     * @param bool $onlyExisting
      * @return array
      */
-    public static function ExtendConfig(array $defaults, array $values): array
+    public static function ExtendConfig(array $defaults, array $values, bool $onlyExisting=true): array
     {
         $merged = [];
-        foreach (array_keys($defaults) as $key) {
+        $mergeKeys = array_keys($defaults);
+        if (!$onlyExisting)
+            $mergeKeys = self::Union($mergeKeys, array_keys($values));
+        foreach ($mergeKeys as $key) {
             if (isset($values[$key])) {
                 if (is_array($defaults[$key]))
                     $merged[$key] = self::ExtendConfig($defaults[$key], $values[$key]);

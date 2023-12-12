@@ -58,12 +58,12 @@ class Application
         $importer = \Closure::bind(static function ($file) {
             return include $file;
         }, null, null);
-        $result = [];
+        $result = null;
         foreach ($fileNames as $file) {
             $file = $this->expandPath($file);
             if (file_exists($file)) {
                 $fd = $importer($file);
-                $result = array_merge_recursive($result, $fd);
+                $result = is_null($result) ? $fd : Arr::ExtendConfig($result, $fd, false);
             }
         }
         return $result;
