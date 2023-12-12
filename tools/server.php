@@ -1,4 +1,11 @@
 <?php
+/**
+ * Nepf2 Framework - server runner
+ *
+ * @link       https://github.com/martok/nepf2
+ * @copyright  Copyright (c) 2023- Martok & Contributors.
+ * @license    Apache License
+ */
 
 // if the server is started with -t, respect that
 chdir($_SERVER['DOCUMENT_ROOT']);

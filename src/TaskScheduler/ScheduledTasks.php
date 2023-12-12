@@ -1,4 +1,11 @@
 <?php
+/**
+ * Nepf2 Framework - Scheduled Tasks
+ *
+ * @link       https://github.com/martok/nepf2
+ * @copyright  Copyright (c) 2023- Martok & Contributors.
+ * @license    Apache License
+ */
 
 namespace Nepf2\TaskScheduler;
 
