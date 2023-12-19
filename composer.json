@@ -5,7 +5,7 @@
 	"require": {
 		"monolog/monolog": "^3.4",
 		"php": ">=8.2.0",
-		"popphp/pop-db": "6.0.x-dev",
+		"popphp/pop-db": "^6.5",
 		"psr/log": "^3.0",
 		"sabre/http": ">=5.0",
 		"sabre/uri": ">=2.0",
