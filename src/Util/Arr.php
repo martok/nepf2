@@ -45,7 +45,7 @@ class Arr
             $mergeKeys = self::Union($mergeKeys, array_keys($values));
         foreach ($mergeKeys as $key) {
             if (isset($values[$key])) {
-                if (is_array($defaults[$key]))
+                if (is_array($defaults[$key]) && !array_is_list($values[$key]))
                     $merged[$key] = self::ExtendConfig($defaults[$key], $values[$key]);
                 else {
                     $merged[$key] = $values[$key];
