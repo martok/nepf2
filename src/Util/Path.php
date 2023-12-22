@@ -25,7 +25,6 @@ class Path
         $newPathParts = [];
         foreach ($pathParts as $pathPart) {
             switch ($pathPart) {
-                case '':
                 case '.':
                     break;
                 case '..':
