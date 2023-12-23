@@ -27,7 +27,38 @@ class Request extends RequestDecorator
         return Uri\parse($this->getAbsoluteUrl());
     }
 
-    public function getAbsoluteBase(): string
+    public function getRequestBase(bool $considerProxy=true): string
+    {
+        // assemble the information given to the server process
+        $proto = $this->getRawServerValue('REQUEST_SCHEME') ?? 'http';
+        $host = $this->getRawServerValue('HTTP_HOST');
+        if (is_null($host)) {
+            $host = $this->getRawServerValue('SERVER_NAME');
+            if (!is_null($host) && !is_null($port = $this->getRawServerValue('SERVER_PORT')))
+                $host = $host . ':' . $port;
+        }
+
+        if (is_null($host)) {
+            // failed to interpret information, fall back to URL splitting
+            return $this->getUrlHost();
+        }
+
+        if ($considerProxy) {
+            if ($fwd_host = $this->getRawServerValue('HTTP_X_FORWARDED_HOST'))
+                $host = $fwd_host;
+            if ($fwd_proto = $this->getRawServerValue('HTTP_X_FORWARDED_PROTO'))
+                $proto = $fwd_proto;
+        }
+
+        return $proto . '://' . $host;
+    }
+
+    public function getRequestUrl(bool $considerProxy=true): string
+    {
+        return $this->getRequestBase($considerProxy) . '/' . ltrim($this->getUrl(), '/');
+    }
+
+    public function getUrlHost(): string
     {
         $p = $this->getUrl();
         $a = $this->getAbsoluteUrl();
