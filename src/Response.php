@@ -18,7 +18,7 @@ class Response extends HTTP\ResponseDecorator
         return new self(new HTTP\Response());
     }
 
-    public function redirect(string $uri, int $status = 301): void
+    public function redirect(string $uri, int $status = 302): void
     {
         $this->setStatus($status);
         $this->setHeader('Location', $uri);
