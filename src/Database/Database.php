@@ -12,6 +12,7 @@ namespace Nepf2\Database;
 use Nepf2\Application;
 use Nepf2\IComponent;
 use Nepf2\Util\Arr;
+use PDO;
 use Pop\Db;
 use Pop\Db\Adapter\AdapterInterface;
 
@@ -44,6 +45,15 @@ class Database implements IComponent
             $config['database'] = $this->app->expandPath($config['database']);
         }
         $db = new PdoAdapter($config);
+        if ($config['type'] === 'sqlite') {
+            // Slightly reduce (but not eliminate) the likelihood of "database is locked" errors
+            // See also: https://www.sqlite.org/wal.html#sometimes_queries_return_sqlite_busy_in_wal_mode
+            $db->setAttribute(PDO::ATTR_TIMEOUT, 5);
+            $db->query('PRAGMA busy_timeout = 5000');
+            $db->query('PRAGMA locking_mode = NORMAL');
+            $db->query('PRAGMA journal_mode = WAL');
+        }
+
         Db\Record::setDb($db);
         $this->db = $db;
         $this->migrationsPath = $this->app->expandPath($config['migrations_path']);
