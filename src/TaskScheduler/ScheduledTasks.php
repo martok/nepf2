@@ -25,14 +25,14 @@ class ScheduledTasks extends \Pop\Db\Record
         if (!$db->tableExists(self::tableName)) {
             $schema = $db->createSchema();
             $schema->create(self::tableName)
-                ->int('id', 16)->increment()
-                ->int('created', 16)
-                ->int('deadline', 16)
-                ->int('interval', 16)->nullable()
+                ->int('id')->increment()
+                ->bigInt('created')
+                ->bigInt('deadline')
+                ->int('interval')->nullable()
                 ->varchar('class', 256)
                 ->varchar('method', 256)->nullable()
                 ->text('arguments')->defaultIs('')
-                ->int('started', 16)->nullable()
+                ->bigInt('started')->nullable()
                 ->primary('id')
                 ->index('deadline');
             $schema->execute();
