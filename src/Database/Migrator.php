@@ -83,4 +83,21 @@ class Migrator extends \Pop\Db\Sql\Migrator
 
         $this->current = null;
     }
+
+    /**
+     * Return the list of migrations that Migrator::run('all') would execute
+     *
+     * @return array
+     */
+    public function pendingMigrations(): array
+    {
+        $stepsToRun = [];
+        foreach ($this->migrations as $timestamp => $migration) {
+            if (strtotime($timestamp) > strtotime((int)$this->current)) {
+                $stepsToRun[] = $timestamp;
+            }
+        }
+        return $stepsToRun;
+    }
+
 }
