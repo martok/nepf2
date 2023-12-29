@@ -21,7 +21,7 @@ class Session implements \Nepf2\IComponent
     private readonly string $session_path;
     private readonly string $session_domain;
     private readonly string $session_scope;
-    private array $access;
+    private ?array $access = null;
     private string|false $session_id;
 
     public function __construct(Application $application)
@@ -59,20 +59,60 @@ class Session implements \Nepf2\IComponent
         session_set_cookie_params($this->session_lifetime, $this->session_path, $this->session_domain, false, true);
     }
 
-    public function started(): bool
+    public function &__get(string $name): mixed
+    {
+        $this->ensureOp('read');
+
+        return $this->access[$name];
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        $this->ensureOp('write');
+
+        $this->access[$name] = $value;
+    }
+
+    public function __isset(string $name): bool
+    {
+        $this->ensureOp('read');
+
+        return isset($this->access[$name]);
+    }
+
+    public function __unset(string $name): void
+    {
+        $this->ensureOp('write');
+
+        unset($this->access[$name]);
+    }
+
+    protected function ensureOp(string $op): void
+    {
+        switch ($op) {
+            case 'read':
+                if (!$this->isBound())
+                    throw new Exception('Session not started before read');
+                break;
+            case 'write':
+                if (!$this->isActive())
+                    throw new Exception('Session not started before read');
+        }
+    }
+
+    public function isBound(): bool
+    {
+        return !is_null($this->access);
+    }
+
+    public function isActive(): bool
     {
         return PHP_SESSION_ACTIVE === session_status();
     }
 
-    protected function ensureStarted(): void
-    {
-        if (!$this->started())
-            throw new \RuntimeException('Session not started');
-    }
-
     public function start(): void
     {
-        if ($this->started())
+        if ($this->isActive())
             return;
 
         // make sure the session cookie contains a valid session ID
@@ -90,6 +130,23 @@ class Session implements \Nepf2\IComponent
         $this->session_id = session_id();
     }
 
+    public function closeWrite(): void
+    {
+        session_write_close();
+    }
+
+    public function destroy(): void
+    {
+        if ($this->isActive()) {
+            $this->resendCookie(true);
+
+            session_unset();
+            session_destroy();
+            $_SESSION = array();
+            $this->access = null;
+        }
+    }
+
     private function resendCookie(bool $destroy): void
     {
         if (isset($_COOKIE[$this->session_name]) && ($_COOKIE[$this->session_name] == $this->session_id)) {
@@ -103,54 +160,9 @@ class Session implements \Nepf2\IComponent
         }
     }
 
-    public function resetCookie(): void
+    public function refreshCookie(): void
     {
         $this->resendCookie(false);
     }
-
-    public function close(): void
-    {
-        session_write_close();
-    }
-
-    public function destroy(): void
-    {
-        $this->ensureStarted();
-
-        $this->resendCookie(true);
-
-        session_unset();
-        session_destroy();
-        $_SESSION = array();
-    }
-
-    public function &__get(string $name): mixed
-    {
-        $this->ensureStarted();
-
-        return $this->access[$name];
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        $this->ensureStarted();
-
-        $this->access[$name] = $value;
-    }
-
-    public function __isset(string $name): bool
-    {
-        $this->ensureStarted();
-
-        return isset($this->access[$name]);
-    }
-
-    public function __unset(string $name): void
-    {
-        $this->ensureStarted();
-
-        unset($this->access[$name]);
-    }
-
 
 }
