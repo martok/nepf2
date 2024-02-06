@@ -1,24 +1,24 @@
 {
-	"name": "martok/nepf2",
-	"description": "Nepf2 - Noch ein PHP Framework 2",
-	"license": "Apache-2.0",
-	"require": {
-		"monolog/monolog": "^3.4",
-		"php": ">=8.2.0",
-		"popphp/pop-db": "^6.5",
-		"psr/log": "^3.0",
-		"sabre/http": ">=5.0",
-		"sabre/uri": ">=2.0",
-		"twig/twig": "^3.6"
-	},
-	"autoload": {
-		"psr-4": {
-			"Nepf2\\": "src/"
-		}
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-main": "1.0.x-dev"
-		}
-	}
+    "name": "martok/nepf2",
+    "description": "Nepf2 - Noch ein PHP Framework 2",
+    "license": "Apache-2.0",
+    "require": {
+        "monolog/monolog": "^3.4",
+        "php": ">=8.2.0",
+        "popphp/pop-db": "^6.5",
+        "psr/log": "^3.0",
+        "sabre/http": ">=5.0",
+        "sabre/uri": ">=2.0",
+        "twig/twig": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nepf2\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    }
 }
