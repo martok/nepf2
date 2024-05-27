@@ -27,6 +27,7 @@ class Router implements IComponent
 {
     public const ComponentName = "router";
     private Application $app;
+    /** @var RouteMatcher[] $routeMatchers */
     private array $routeMatchers = [];
 
     public function __construct(Application $application)
@@ -38,7 +39,7 @@ class Router implements IComponent
     {
     }
 
-    public function addControllers(array $classes, string $prefix = "")
+    public function addControllers(array $classes, string $prefix = ""): void
     {
         foreach ($classes as $className) {
             $reflectionClass = new ReflectionClass($className);
@@ -51,9 +52,7 @@ class Router implements IComponent
                 $params = $this->checkFormalParameters($reflectionMethod->getParameters(), $errPrefix);
                 // collect other parameter info we may need
                 $declParameters = $this->getDeclParameters($params, $errPrefix);
-                $requiredParams = array_keys(array_filter($declParameters, function ($p) {
-                    return $p['required'];
-                }));
+                $requiredParams = array_keys(array_filter($declParameters, fn ($p) => $p['required']));
                 // we now know where everything goes, parse what we need for each possible route
                 foreach ($routeAttribs as $routeAttrib) {
                     /* @var $route Auto\Route */
@@ -71,6 +70,35 @@ class Router implements IComponent
                 }
             }
         }
+        $this->sortMatchers();
+    }
+
+    public function addStaticContent(string $fragment, string $localPath,
+                                     string $filter = "*.*", bool $recursive = true,
+                                     int $priority = 0, string $prefix = "",
+                                     ): void
+    {
+        // expand local
+        $fullLocal = $this->app->expandPath($localPath);
+        // expand path prefix
+        $fullFragment = Path::Join($prefix, $fragment);
+
+        $matcher = new StaticMatcher();
+        $matcher->setPath($fullFragment, $recursive);
+        if ($matcher->isDirectory) {
+            if (!is_dir($fullLocal)) {
+                throw new TypeError("$fullFragment: Local path {$localPath} is not a directory, but route is a directory");
+            }
+        } else {
+            if (!is_file($fullLocal)) {
+                throw new TypeError("$fullFragment: Local path {$localPath} is not a file, but route is not a directory");
+            }
+        }
+
+        $matcher->setFilter($filter);
+        $matcher->priority = $priority;
+        $matcher->localPath = $fullLocal;
+        $this->routeMatchers[] = $matcher;
         $this->sortMatchers();
     }
 
@@ -95,7 +123,7 @@ class Router implements IComponent
 
     private function sortMatchers(): void
     {
-        usort($this->routeMatchers, function ($a, $b) {
+        usort($this->routeMatchers, function (RouteMatcher $a, RouteMatcher $b) {
             // highest priority first
             if ($a->priority < $b->priority)
                 return 1;

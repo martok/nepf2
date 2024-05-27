@@ -114,7 +114,7 @@ class RouteExpression
         }
         if ($this->slash)
             $expr .= '/?';
-        $matcher = new RouteMatcher();
+        $matcher = new ControllerMatcher();
         $matcher->expression = '%^' . $expr . '$%';
         $matcher->fixedLength = $fixed;
         $matcher->boundMethod = $handlerMethod;
