@@ -208,7 +208,7 @@ class Application
         $method = $request->getMethod();
         $path = $request->uri()['path'];
         $path = '/' . ltrim($path, '/');
-        /* @var $match ?RouteMatcher */
+        /** @var ?RouteMatcher $match */
         if ($match = $this->router->match($method, $path)) {
             $response->setStatus(200);
             try {

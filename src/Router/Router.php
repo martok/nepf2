@@ -55,7 +55,7 @@ class Router implements IComponent
                 $requiredParams = array_keys(array_filter($declParameters, fn ($p) => $p['required']));
                 // we now know where everything goes, parse what we need for each possible route
                 foreach ($routeAttribs as $routeAttrib) {
-                    /* @var $route Auto\Route */
+                    /** @var Auto\Route $route */
                     $route = $routeAttrib->newInstance();
                     // parse the route expression
                     $expr = new RouteExpression(Path::Join($classPrefix, $route->fragment), $route->slash);
