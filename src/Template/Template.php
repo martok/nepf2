@@ -62,25 +62,28 @@ class Template implements IComponent
         return new TemplateView($this->twig, $name);
     }
 
+    public static function formatFileSize($size): string
+    {
+        if (!is_numeric($size))
+            $size = (int)$size;
+
+        $units = array(
+            1024**4 => 'TiB',
+            1024**3 => 'GiB',
+            1024**2 => 'MiB',
+            1024 => 'KiB'
+        );
+
+        foreach ($units as $unit => $val) {
+            if ($size < $unit * 1.1) continue;
+            return sprintf('%.1f %s', $size / $unit, $val);
+        }
+        return sprintf('%d Bytes', $size);
+    }
+
     private function addTwigFilters(Twig\Environment $env): void
     {
-        $env->addFilter(new Twig\TwigFilter('filesize', function ($size) {
-            if (!is_numeric($size))
-                $size = (int)$size;
-
-            $units = array(
-                1024**4 => 'TiB',
-                1024**3 => 'GiB',
-                1024**2 => 'MiB',
-                1024 => 'KiB'
-            );
-
-            foreach ($units as $unit => $val) {
-                if ($size < $unit * 1.1) continue;
-                return sprintf('%.1f %s', $size / $unit, $val);
-            }
-            return sprintf('%d Bytes', $size);
-        }));
+        $env->addFilter(new Twig\TwigFilter('filesize', self::formatFileSize(...)));
 
     }
 }
